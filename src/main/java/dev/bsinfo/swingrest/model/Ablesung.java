@@ -1,6 +1,7 @@
 package dev.bsinfo.swingrest.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -104,6 +105,28 @@ public class Ablesung {
 		builder.append(";");
 		return builder.toString();
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Ablesung other = (Ablesung) obj;
+		return Objects.equals(datum, other.datum) && Objects.equals(id, other.id)
+				&& Objects.equals(kommentar, other.kommentar) && Objects.equals(kunde, other.kunde)
+				&& neuEingebaut == other.neuEingebaut && Objects.equals(zaehlernummer, other.zaehlernummer)
+				&& Objects.equals(zaehlerstand, other.zaehlerstand);
+	}
+	
+	
 	
 	
 

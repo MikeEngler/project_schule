@@ -1,10 +1,31 @@
 package dev.bsinfo.swingrest.model;
 
+import java.util.Objects;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
+//@XmlAccessorType(XmlAccessType.FIELD)
+//@XmlRootElement(name = "employee")
+//@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+//@JsonTypeName(value = "employee")
+
 public class Kunde {
+	
+	@NotEmpty
 	String name;
+	
+	@NotEmpty
 	String vorname;
+	
 	UUID id;
 
 	public Kunde() {
@@ -41,5 +62,25 @@ public class Kunde {
 	public void setId(UUID id) {
 		this.id = id;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Kunde other = (Kunde) obj;
+		return Objects.equals(id, other.id) && Objects.equals(name, other.name)
+				&& Objects.equals(vorname, other.vorname);
+	}
+	
+	
 
 }

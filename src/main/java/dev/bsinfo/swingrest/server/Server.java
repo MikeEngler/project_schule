@@ -40,7 +40,7 @@ public class Server extends Application {
 			System.out.println(url);
 
 			final ResourceConfig rc = new ResourceConfig().packages(pack);
-
+			
 			server = JdkHttpServerFactory.createHttpServer(URI.create(url), rc);
 			System.out.println("Ready for Requests....");
 
@@ -85,5 +85,4 @@ public class Server extends Application {
 			}
 		System.exit(0);
 	}
-
 }

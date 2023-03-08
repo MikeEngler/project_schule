@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 import dev.bsinfo.swingrest.model.Ablesung;
 import dev.bsinfo.swingrest.model.Kunde;
 import dev.bsinfo.swingrest.server.Server;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -23,8 +25,9 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 
-@Path("/")
+@Path("/hausverwaltung")
 public class RestController {
 
 	// @Inject :(
@@ -34,36 +37,59 @@ public class RestController {
 	@Path("/kunden")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String createKunde(Kunde kunde) {
+	public Response createKunde(Kunde kunde) {
+		if (kunde == null)
+			return Response.status(400).entity("Body may not be empty").build();
 		Server.DATABASE.getKunden().put(kunde.getId().toString(), kunde);
-		return kunde.getId().toString();
+		ResponseBuilder response = Response.created(null);
+		response.entity(kunde);
+		return response.build();
 	}
 
 	@POST
 	@Path("/ablesungen")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String createAblesung(Ablesung ablesung) {
+	public Response createAblesung(Ablesung ablesung) {
+		if (ablesung == null)
+			return Response.status(400).entity("Body may not be empty").build();
+		Kunde kunde = ablesung.getKunde();
+		if (kunde == null 
+				|| !Server.DATABASE.getKunden().containsKey(kunde.getId().toString()))
+			return Response.status(404).entity("Kunde konnte nicht gefunden werden").build();
+
 		Server.DATABASE.getAblesungen().put(ablesung.getId().toString(), ablesung);
-		return ablesung.getId().toString();
+		ResponseBuilder response = Response.created(null);
+		response.entity(ablesung);
+		return response.build();
+
 	}
 
 	@PUT
 	@Path("/kunden")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
-	public String updateKunde(Kunde kunde) {
+	public Response updateKunde(Kunde kunde) {
+		if (kunde == null)
+			return Response.status(400).entity("Body may not be empty").build();
+		if (!Server.DATABASE.getKunden().containsKey(kunde.getId().toString()))
+			return Response.status(404).entity("Kunde konnte nicht gefunden werden").build();
 		Server.DATABASE.getKunden().put(kunde.getId().toString(), kunde);
-		return kunde.getId().toString();
-	};
+		return Response.status(200).entity("Updated").build();
+	}
 
 	@PUT
 	@Path("/ablesungen")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
-	public String updateAblesung(Ablesung ablesung) {
+	public Response updateAblesung(Ablesung ablesung) {
+		if (ablesung == null)
+			return Response.status(400).entity("Body may not be empty").build();
+		if (ablesung.getId() == null 
+				|| !Server.DATABASE.getAblesungen().containsKey(ablesung.getId().toString()))
+			return Response.status(404).entity("Ablesung konnte nicht gefunden werden").build();
 		Server.DATABASE.getAblesungen().put(ablesung.getId().toString(), ablesung);
-		return ablesung.getId().toString();
+		return Response.ok("Updated").build();
 	}
 
 	@DELETE
@@ -90,8 +116,10 @@ public class RestController {
 	@GET
 	@Path("/kunden/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Kunde getKunde(@PathParam("id") String id) {
-		return Server.DATABASE.getKunden().get(id);
+	public Response getKunde(@PathParam("id") String id) {
+		if (!Server.DATABASE.getKunden().containsKey(id))
+			return Response.status(404).entity("Kunde konnte nicht gefunden werden").build();
+		return Response.ok(Server.DATABASE.getKunden().get(id)).build();
 	}
 
 	@GET
@@ -106,8 +134,10 @@ public class RestController {
 	@GET
 	@Path("/ablesungen/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Ablesung getAblesungen(@PathParam("id") String id) {
-		return Server.DATABASE.getAblesungen().get(id);
+	public Response getAblesungen(@PathParam("id") String id) {
+		if (!Server.DATABASE.getAblesungen().containsKey(id))
+			return Response.status(404).entity("Ablesung konnte nicht gefunden werden").build();
+		return Response.ok(Server.DATABASE.getAblesungen().get(id)).build();
 	}
 
 	@GET
@@ -115,7 +145,7 @@ public class RestController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Ablesung> getAblesung(@QueryParam("kunde") String id, @QueryParam("beginn") String beginn,
 			@QueryParam("ende") String ende) {
-		
+
 		// Validation
 		try {
 			LocalDate beginnDate = LocalDate.parse(beginn);
@@ -127,7 +157,7 @@ public class RestController {
 
 			// Results empty -> 404
 			List<Ablesung> ablesungen = zeitraum.toList();
-			if(ablesungen.isEmpty()){
+			if (ablesungen.isEmpty()) {
 				throw new WebApplicationException(Response.Status.NOT_FOUND);
 			}
 			return ablesungen;
@@ -138,5 +168,4 @@ public class RestController {
 
 	}
 
-	
 }
