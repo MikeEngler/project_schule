@@ -1,5 +1,4 @@
 
-
 package dev.bsinfo.swingrest.ui;
 
 import javax.swing.*;
@@ -7,11 +6,16 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.Vector;
+import com.formdev.flatlaf.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 
+@SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
 	private JPanel lowerPanel;
@@ -40,7 +44,7 @@ public class MainWindow extends JFrame {
 	}
 
 	public static void showFrame() {
-		JFrame window = new MainWindow("Test window");
+		JFrame window = new MainWindow("Zählerstand-Ableser");
 		window.pack();
 		window.setVisible(true);
 	}
@@ -84,11 +88,12 @@ public class MainWindow extends JFrame {
 		// Initialize Buttons and append action listeners
 		JButton save = new JButton("Save");
 		save.addActionListener(e -> {
-			// Sets the current row with the data from textfields or appends a new row if none is selected
-			tableModel.updateRow(new String[]{textField1.getText(), textField2.getText(), textField3.getText(),
-					textField4.getText(), textField5.getText(), textField6.getText()});
+			// Sets the current row with the data from textfields or appends a new row if
+			// none is selected
+			tableModel.updateRow(new String[] { textField1.getText(), textField2.getText(), textField3.getText(),
+					textField4.getText(), textField5.getText(), textField6.getText(), textField7.getText() });
 			// Reset current selection and fields
-			tableModel.selectedRowIndex = -1;
+			tableModel.selectedRowIndex = 0;
 			table.clearSelection();
 			clearTextFields();
 		});
@@ -125,19 +130,23 @@ public class MainWindow extends JFrame {
 		textField4.setText("");
 		textField5.setText("");
 		textField6.setText("");
+		textField7.setText("");
 	}
 
 	/**
 	 * Sets all text fields with the current selection from the JTable
+	 * 
 	 * @param data
+	 * @return
 	 */
-	private void setTextFields(Vector data) {
+	private void setTextFields(@SuppressWarnings("rawtypes") Vector data) {
 		textField1.setText(String.valueOf(data.get(0)));
 		textField2.setText(String.valueOf(data.get(1)));
 		textField3.setText(String.valueOf(data.get(2)));
 		textField4.setText(String.valueOf(data.get(3)));
 		textField5.setText(String.valueOf(data.get(4)));
 		textField6.setText(String.valueOf(data.get(5)));
+		textField7.setText(String.valueOf(data.get(6)));
 	}
 
 	private void initTable() {
@@ -150,8 +159,9 @@ public class MainWindow extends JFrame {
 		selectionModel.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (table.getSelectedRow() >= 0) {
-					ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+					// ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 					tableModel.selectedRowIndex = table.getSelectedRow();
+					@SuppressWarnings("rawtypes")
 					Vector data = tableModel.getDataVector().elementAt(tableModel.selectedRowIndex);
 					setTextFields(data);
 				}
@@ -160,28 +170,97 @@ public class MainWindow extends JFrame {
 		JButton exportButton = new JButton("Export");
 		lowerPanel.add(exportButton);
 		exportButton.addActionListener(e -> {
-			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-			File selectedFile = fileChooser.getSelectedFile();
-			try (FileWriter fw = new FileWriter(selectedFile)) {
-				StringBuilder sb = new StringBuilder();
-				for (int i = 0; i < tableModel.getColumnCount(); i++) {
-					fw.write(tableModel.getColumnName(i) + ";");
-				}
-				for (Vector row : tableModel.getDataVector()) {
-					String s = String.join(";", row) + "\n";
-					sb.append(s);
-				}
-				fw.write(sb.toString());
-				fw.flush();
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
-			}
 
+			@SuppressWarnings("rawtypes")
+			Vector data = tableModel.getDataVector().elementAt(tableModel.selectedRowIndex);
+
+			ArrayList<String> dataStrings = new ArrayList<String>();
+			dataStrings.add(String.valueOf(data.get(0)));
+			dataStrings.add(String.valueOf(data.get(1)));
+			dataStrings.add(String.valueOf(data.get(2)));
+			dataStrings.add(String.valueOf(data.get(3)));
+			dataStrings.add(String.valueOf(data.get(4)));
+			dataStrings.add(String.valueOf(data.get(5)));
+			dataStrings.add(String.valueOf(data.get(6)));
+			writeToFile(dataStrings, "data.txt");
 		});
+
+		// delete button for deleting locally saved data from file
+		JButton deleteButton = new JButton("Delete savefiles");
+		lowerPanel.add(deleteButton);
+		deleteButton.addActionListener(e -> {
+
+			deleteFile("data.txt");
+		});
+
+//		// loads data from file
+//		JButton loadDataButton = new JButton("Load existing data");
+//		lowerPanel.add(loadDataButton);
+//		loadDataButton.addActionListener(e -> {
+//		//		loadFromFile("data.txt");
+//			
+//		});
 	}
 
+	// takes an arraylist of strings an writes it to a txt file
+	public static void writeToFile(ArrayList<String> strings, String filename) {
+		try {
+			FileWriter writer = new FileWriter(filename);
+			for (String s : strings) {
+				writer.write(s + "\n");
+			}
+			writer.close();
+			System.out.println("Successfully wrote data to file " + filename);
+		} catch (IOException e) {
+			System.out.println("An error occurred while writing to the file " + filename + ": " + e.getMessage());
+		}
+	}
+
+	// deletes the save file
+	public static void deleteFile(String fileName) {
+		File data = new File(fileName);
+		data.delete();
+		System.out.println("the file " + fileName + " has been deleted!");
+	}
+
+//	// loads data from textfile into app
+//	public static ArrayList<String> loadFromFile(String fileName) {
+//			File data = new File(fileName);
+//		
+//		ArrayList<String> loadedData = new ArrayList<String>();
+//		try {
+//			@SuppressWarnings("resource")
+//			Scanner dataScraper = new Scanner(data);
+//			while (dataScraper.hasNextLine()) {
+//				String info = dataScraper.nextLine();
+//				loadedData.add(info);
+//			}
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return loadedData;
+//	}
+//	
+//	public static void displayData(ArrayList data) {
+//		
+//	}
+
+	// main method // starting point
 	public static void main(String[] args) {
+
+		// theming
+		// establish theming via flatlaf
+		FlatLightLaf.setup();
+
+		// setting theme to dracula if possible else throw exeption
+		try {
+			UIManager.setLookAndFeel(new FlatDarculaLaf());
+		} catch (Exception ex) {
+			System.err.println("Failed to initialize LaF");
+		}
+
+		// shows gui
 		SwingUtilities.invokeLater(MainWindow::showFrame);
 	}
 
@@ -194,16 +273,16 @@ public class MainWindow extends JFrame {
 			initData();
 		}
 
-		public void updateRow(String[] data){
-			if(this.selectedRowIndex >= 0){
-				for(int index = 0; index < data.length; index++)
+		public void updateRow(String[] data) {
+			if (this.selectedRowIndex >= 0) {
+				for (int index = 0; index < data.length; index++)
 					setValueAt(data[index], selectedRowIndex, index);
 			} else {
 				this.addRow(data);
 			}
 		}
 
-		private void initData(){
+		private void initData() {
 			this.addColumn("Kundennummer");
 			this.addColumn("Hausnummer");
 			this.addColumn("Wohnungsnummer");
