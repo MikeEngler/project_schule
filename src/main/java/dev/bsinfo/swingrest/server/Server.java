@@ -9,19 +9,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import com.sun.net.httpserver.HttpServer;
 
 import dev.bsinfo.swingrest.model.Ablesung;
-import dev.bsinfo.swingrest.model.Kunde;
 import dev.bsinfo.swingrest.server.data.Database;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Application;
 
 public class Server extends Application {

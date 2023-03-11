@@ -6,17 +6,15 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.Vector;
-import com.formdev.flatlaf.*;
-
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Vector;
+import com.formdev.flatlaf.*;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
@@ -52,7 +50,7 @@ public class MainWindow extends JFrame {
 		window.setVisible(true);
 		return window;
 	}
-	
+
 	public static void popUp(String message) {
 		JFrame pop = new JFrame();
 		JOptionPane.showMessageDialog(pop, message);
@@ -142,6 +140,34 @@ public class MainWindow extends JFrame {
 		textField7.setText("");
 	}
 
+	// loads text from file
+	public void loadData(String filePath) {
+
+		ArrayList<String> data = new ArrayList<>();
+
+		if (checkFile(filePath) == true) {
+			try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+				String line;
+				while ((line = br.readLine()) != null) {
+					data.add(line);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			textField1.setText(String.valueOf(data.get(0)));
+			textField2.setText(String.valueOf(data.get(1)));
+			textField3.setText(String.valueOf(data.get(2)));
+			textField4.setText(String.valueOf(data.get(3)));
+			textField5.setText(String.valueOf(data.get(4)));
+			textField6.setText(String.valueOf(data.get(5)));
+			textField7.setText(String.valueOf(data.get(6)));
+		} else {
+			popUp("No file to load from!");
+		}
+
+	}
+
 	/**
 	 * Sets all text fields with the current selection from the JTable
 	 * 
@@ -176,6 +202,8 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
+
+		// button for exporting data to file
 		JButton exportButton = new JButton("Export");
 		lowerPanel.add(exportButton);
 		exportButton.addActionListener(e -> {
@@ -191,15 +219,32 @@ public class MainWindow extends JFrame {
 			dataStrings.add(String.valueOf(data.get(4)));
 			dataStrings.add(String.valueOf(data.get(5)));
 			dataStrings.add(String.valueOf(data.get(6)));
+
 			writeToFile(dataStrings, "data.txt");
+
 		});
 
 		// delete button for deleting locally saved data from file
-		JButton deleteButton = new JButton("Delete savefiles");
+		JButton deleteButton = new JButton("Delete savefile");
 		lowerPanel.add(deleteButton);
 		deleteButton.addActionListener(e -> {
+			if(checkFile("data.txt")) {
+				deleteFile("data.txt");
+			}
+			else {
+				popUp("No file to delete");
+			}
+		});
 
-			deleteFile("data.txt");
+		// button for loading
+		JButton loadButton = new JButton("Load data from savefile");
+		lowerPanel.add(loadButton);
+		loadButton.addActionListener(e -> {
+			loadData("data.txt");
+			
+			if(checkFile("data.txt")) {
+				popUp("Data loaded successfully!");
+			}
 		});
 	}
 
@@ -226,7 +271,17 @@ public class MainWindow extends JFrame {
 		popUp("the file " + fileName + " has been deleted!");
 	}
 
-	// main method // starting point
+	// checks if a given file exists
+	public boolean checkFile(String filePath) {
+		boolean exists = false;
+		File f = new File(filePath);
+		if (f.exists() && !f.isDirectory()) {
+			exists = true;
+		}
+		return exists;
+	}
+
+	// main method -> app starting point
 	public static void main(String[] args) {
 
 		// theming
