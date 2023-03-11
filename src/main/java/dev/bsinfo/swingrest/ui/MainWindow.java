@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Vector;
 import com.formdev.flatlaf.*;
@@ -44,11 +43,10 @@ public class MainWindow extends JFrame {
 		tableModel = new TableModel();
 	}
 
-	public static JFrame showFrame() {
+	public static void showFrame() {
 		JFrame window = new MainWindow("Zählerstand-Ableser");
 		window.pack();
 		window.setVisible(true);
-		return window;
 	}
 
 	public static void popUp(String message) {
@@ -228,10 +226,9 @@ public class MainWindow extends JFrame {
 		JButton deleteButton = new JButton("Delete savefile");
 		lowerPanel.add(deleteButton);
 		deleteButton.addActionListener(e -> {
-			if(checkFile("data.txt")) {
+			if (checkFile("data.txt")) {
 				deleteFile("data.txt");
-			}
-			else {
+			} else {
 				popUp("No file to delete");
 			}
 		});
@@ -241,8 +238,8 @@ public class MainWindow extends JFrame {
 		lowerPanel.add(loadButton);
 		loadButton.addActionListener(e -> {
 			loadData("data.txt");
-			
-			if(checkFile("data.txt")) {
+
+			if (checkFile("data.txt")) {
 				popUp("Data loaded successfully!");
 			}
 		});
