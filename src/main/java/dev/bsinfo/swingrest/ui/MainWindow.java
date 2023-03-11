@@ -12,8 +12,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Vector;
 import com.formdev.flatlaf.*;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
@@ -43,10 +46,16 @@ public class MainWindow extends JFrame {
 		tableModel = new TableModel();
 	}
 
-	public static void showFrame() {
+	public static JFrame showFrame() {
 		JFrame window = new MainWindow("Zählerstand-Ableser");
 		window.pack();
 		window.setVisible(true);
+		return window;
+	}
+	
+	public static void popUp(String message) {
+		JFrame pop = new JFrame();
+		JOptionPane.showMessageDialog(pop, message);
 	}
 
 	private void initLayout() {
@@ -192,14 +201,6 @@ public class MainWindow extends JFrame {
 
 			deleteFile("data.txt");
 		});
-
-//		// loads data from file
-//		JButton loadDataButton = new JButton("Load existing data");
-//		lowerPanel.add(loadDataButton);
-//		loadDataButton.addActionListener(e -> {
-//		//		loadFromFile("data.txt");
-//			
-//		});
 	}
 
 	// takes an arraylist of strings an writes it to a txt file
@@ -211,6 +212,7 @@ public class MainWindow extends JFrame {
 			}
 			writer.close();
 			System.out.println("Successfully wrote data to file " + filename);
+			popUp("Successfully wrote data to file " + filename);
 		} catch (IOException e) {
 			System.out.println("An error occurred while writing to the file " + filename + ": " + e.getMessage());
 		}
@@ -221,30 +223,8 @@ public class MainWindow extends JFrame {
 		File data = new File(fileName);
 		data.delete();
 		System.out.println("the file " + fileName + " has been deleted!");
+		popUp("the file " + fileName + " has been deleted!");
 	}
-
-//	// loads data from textfile into app
-//	public static ArrayList<String> loadFromFile(String fileName) {
-//			File data = new File(fileName);
-//		
-//		ArrayList<String> loadedData = new ArrayList<String>();
-//		try {
-//			@SuppressWarnings("resource")
-//			Scanner dataScraper = new Scanner(data);
-//			while (dataScraper.hasNextLine()) {
-//				String info = dataScraper.nextLine();
-//				loadedData.add(info);
-//			}
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		return loadedData;
-//	}
-//	
-//	public static void displayData(ArrayList data) {
-//		
-//	}
 
 	// main method // starting point
 	public static void main(String[] args) {
