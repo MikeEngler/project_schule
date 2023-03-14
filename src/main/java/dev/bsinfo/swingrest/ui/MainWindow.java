@@ -98,9 +98,10 @@ public class MainWindow extends JFrame {
 			tableModel.updateRow(new String[] { textField1.getText(), textField2.getText(), textField3.getText(),
 					textField4.getText(), textField5.getText(), textField6.getText(), textField7.getText() });
 			// Reset current selection and fields
-			tableModel.selectedRowIndex = 0;
+			tableModel.selectedRowIndex = -1;
 			table.clearSelection();
 			clearTextFields();
+			popUp("Data saved!");
 		});
 		JButton clear = new JButton("Clear");
 		clear.addActionListener(e -> {
@@ -108,6 +109,7 @@ public class MainWindow extends JFrame {
 			clearTextFields();
 			tableModel.selectedRowIndex = -1;
 			table.clearSelection();
+			popUp("Data cleared");
 		});
 
 		upperPanel.add(label1);
