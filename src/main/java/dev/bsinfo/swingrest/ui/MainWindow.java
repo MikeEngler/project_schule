@@ -206,28 +206,31 @@ public class MainWindow extends JFrame {
 		lowerPanel.add(exportButton);
 		exportButton.addActionListener(e -> {
 
-			@SuppressWarnings("rawtypes")
-			Vector data = tableModel.getDataVector().elementAt(tableModel.selectedRowIndex);
+			try {
+				@SuppressWarnings("rawtypes")
+				Vector data = tableModel.getDataVector().elementAt(tableModel.selectedRowIndex);
 
-			ArrayList<String> dataStrings = new ArrayList<String>();
-			dataStrings.add(String.valueOf(data.get(0)));
-			dataStrings.add(String.valueOf(data.get(1)));
-			dataStrings.add(String.valueOf(data.get(2)));
-			dataStrings.add(String.valueOf(data.get(3)));
-			dataStrings.add(String.valueOf(data.get(4)));
-			dataStrings.add(String.valueOf(data.get(5)));
-			dataStrings.add(String.valueOf(data.get(6)));
+				ArrayList<String> dataStrings = new ArrayList<String>();
+				dataStrings.add(String.valueOf(data.get(0)));
+				dataStrings.add(String.valueOf(data.get(1)));
+				dataStrings.add(String.valueOf(data.get(2)));
+				dataStrings.add(String.valueOf(data.get(3)));
+				dataStrings.add(String.valueOf(data.get(4)));
+				dataStrings.add(String.valueOf(data.get(5)));
+				dataStrings.add(String.valueOf(data.get(6)));
 
-			writeToFile(dataStrings, "data.txt");
-
+				writeToFile(dataStrings, "data.csv");
+			}catch(Exception ex) {
+				popUp("No data to export!");
+			}
 		});
 
 		// delete button for deleting locally saved data from file
 		JButton deleteButton = new JButton("Delete savefile");
 		lowerPanel.add(deleteButton);
 		deleteButton.addActionListener(e -> {
-			if (checkFile("data.txt")) {
-				deleteFile("data.txt");
+			if (checkFile("data.csv")) {
+				deleteFile("data.csv");
 			} else {
 				popUp("No file to delete");
 			}
@@ -237,9 +240,9 @@ public class MainWindow extends JFrame {
 		JButton loadButton = new JButton("Load data from savefile");
 		lowerPanel.add(loadButton);
 		loadButton.addActionListener(e -> {
-			loadData("data.txt");
+			loadData("data.csv");
 
-			if (checkFile("data.txt")) {
+			if (checkFile("data.csv")) {
 				popUp("Data loaded successfully!");
 			}
 		});
